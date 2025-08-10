@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mutual-fund-analyzer"
+version = "1.0.0"
+description = "Mutual Fund Analysis and Recommendation System"
+requires-python = ">=3.8,<3.12"
+dependencies = [
+    "flask==2.3.3",
+    "requests==2.31.0",
+    "pandas==2.0.3",
+    "numpy==1.24.3",
+    "google-generativeai==0.3.2",
+    "python-dotenv==1.0.0",
+    "beautifulsoup4==4.12.2",
+    "lxml==4.9.3",
+    "yfinance==0.2.18",
+    "plotly==5.17.0",
+    "dash==2.14.1",
+    "dash-bootstrap-components==1.5.0"
+]
+
+[tool.setuptools]
+packages = ["app", "mutual_fund_analyzer", "llm_recommender"]
