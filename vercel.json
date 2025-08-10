@@ -18,6 +18,12 @@
   ],
   "env": {
     "PYTHONPATH": ".",
-    "PYTHON_VERSION": "3.11"
+    "PYTHON_VERSION": "3.11",
+    "PYTHON_RUNTIME": "python3.11"
+  },
+  "build": {
+    "env": {
+      "PYTHON_VERSION": "3.11"
+    }
   }
 }
