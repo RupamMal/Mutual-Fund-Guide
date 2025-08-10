@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            max-width: 300px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-container">
+        <canvas id="testChart" width="300" height="150"></canvas>
+    </div>
+
+    <script>
+        // Test data similar to what the API returns
+        const testAllocations = {
+            "large_cap": {
+                "percentage": 35,
+                "amount": 35000
+            },
+            "mid_cap": {
+                "percentage": 25,
+                "amount": 25000
+            },
+            "flexi_cap": {
+                "percentage": 25,
+                "amount": 25000
+            },
+            "small_cap": {
+                "percentage": 10,
+                "amount": 10000
+            },
+            "multi_cap": {
+                "percentage": 5,
+                "amount": 5000
+            }
+        };
+
+        function createTestChart(allocations) {
+            const ctx = document.getElementById('testChart').getContext('2d');
+            
+            const labels = Object.keys(allocations).map(key => key.replace('_', ' ').toUpperCase());
+            const data = Object.values(allocations).map(item => item.percentage);
+            const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'];
+
+            const chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create the test chart
+        createTestChart(testAllocations);
+        console.log('Test chart created successfully!');
+    </script>
+</body>
+</html>
