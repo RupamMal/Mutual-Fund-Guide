@@ -5,7 +5,7 @@
       "src": "wsgi.py",
       "use": "@vercel/python",
       "config": {
-        "runtime": "python3.11",
+        "runtime": "python3.13",
         "maxLambdaSize": "50mb"
       }
     }
@@ -18,12 +18,12 @@
   ],
   "env": {
     "PYTHONPATH": ".",
-    "PYTHON_VERSION": "3.11",
-    "PYTHON_RUNTIME": "python3.11"
+    "PYTHON_VERSION": "3.13",
+    "PYTHON_RUNTIME": "python3.13"
   },
   "build": {
     "env": {
-      "PYTHON_VERSION": "3.11"
+      "PYTHON_VERSION": "3.13"
     }
   }
 }
