@@ -1,15 +1,10 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "wsgi.py",
-      "use": "@vercel/python",
-      "config": {
-        "runtime": "python3.13",
-        "maxLambdaSize": "250mb"
-      }
+  "functions": {
+    "wsgi.py": {
+      "runtime": "python3.13"
     }
-  ],
+  },
   "routes": [
     {
       "src": "/(.*)",
@@ -20,10 +15,5 @@
     "PYTHONPATH": ".",
     "PYTHON_VERSION": "3.13",
     "PYTHON_RUNTIME": "python3.13"
-  },
-  "build": {
-    "env": {
-      "PYTHON_VERSION": "3.13"
-    }
   }
 }
