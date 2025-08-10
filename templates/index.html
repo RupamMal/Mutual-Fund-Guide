@@ -17,6 +17,22 @@
             --dark-bg: #34495e;
         }
 
+        /* PDF-specific styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #resultsSection, #resultsSection * {
+                visibility: visible;
+            }
+            #resultsSection {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -874,6 +890,12 @@
                         <button class="btn btn-primary btn-lg" id="downloadPdfBtn">
                             <i class="fas fa-file-pdf"></i> Download PDF Report
                         </button>
+                        <div id="pdfProgress" class="mt-3" style="display: none;">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
+                            </div>
+                            <small class="text-muted">Generating high-quality PDF...</small>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -984,24 +1006,233 @@
 
         // PDF Download functionality
         document.getElementById('downloadPdfBtn').addEventListener('click', function() {
+            // Check if results are available
+            if (!document.getElementById('resultsSection').children.length || 
+                document.getElementById('resultsSection').style.display === 'none') {
+                alert('Please generate recommendations first before downloading the PDF.');
+                return;
+            }
             downloadPDF();
         });
 
         async function downloadPDF() {
-            const element = document.getElementById('resultsSection');
-            const opt = {
-                margin: 1,
-                filename: 'mutual-fund-report.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-            };
-
             try {
-                await html2pdf().set(opt).from(element).save();
+                // Show loading state
+                const btn = document.getElementById('downloadPdfBtn');
+                const progressDiv = document.getElementById('pdfProgress');
+                const originalText = btn.innerHTML;
+                
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating PDF...';
+                btn.disabled = true;
+                progressDiv.style.display = 'block';
+
+                // Create a clean version for PDF
+                const pdfElement = createPDFVersion();
+                
+                const opt = {
+                    margin: [0.5, 0.5, 0.5, 0.5],
+                    filename: 'mutual-fund-report.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff'
+                    },
+                    jsPDF: { 
+                        unit: 'in', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    }
+                };
+
+                await html2pdf().set(opt).from(pdfElement).save();
+                
+                // Clean up
+                document.body.removeChild(pdfElement);
+                
             } catch (error) {
+                console.error('PDF Generation Error:', error);
                 alert('Error generating PDF: ' + error.message);
+            } finally {
+                // Restore button and hide progress
+                const btn = document.getElementById('downloadPdfBtn');
+                const progressDiv = document.getElementById('pdfProgress');
+                
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                progressDiv.style.display = 'none';
             }
+        }
+
+        function createPDFVersion() {
+            // Clone the results section
+            const originalElement = document.getElementById('resultsSection');
+            const pdfElement = originalElement.cloneNode(true);
+            
+            // Add PDF header
+            const header = document.createElement('div');
+            header.innerHTML = `
+                <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #333; padding-bottom: 20px;">
+                    <h2 style="color: #333; margin: 0; font-size: 24px; font-weight: bold;">Mutual Fund Investment Report</h2>
+                    <p style="color: #666; margin: 10px 0 0 0; font-size: 14px;">Generated on ${new Date().toLocaleDateString('en-IN')} at ${new Date().toLocaleTimeString('en-IN')}</p>
+                </div>
+            `;
+            pdfElement.insertBefore(header, pdfElement.firstChild);
+            
+            // Add PDF footer
+            const footer = document.createElement('div');
+            footer.innerHTML = `
+                <div style="text-align: center; margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px; color: #666; font-size: 12px;">
+                    <p style="margin: 0;">This report is generated by Your Mutual Fund Advisor</p>
+                    <p style="margin: 5px 0 0 0;">For investment decisions, please consult with a financial advisor</p>
+                </div>
+            `;
+            pdfElement.appendChild(footer);
+            
+            // Add PDF-specific styling
+            pdfElement.style.cssText = `
+                background: white !important;
+                color: black !important;
+                font-family: Arial, sans-serif !important;
+                font-size: 12px !important;
+                line-height: 1.4 !important;
+                padding: 20px !important;
+                margin: 0 !important;
+                width: 100% !important;
+                max-width: none !important;
+                box-shadow: none !important;
+                border: none !important;
+            `;
+
+            // Remove interactive elements and buttons
+            const buttons = pdfElement.querySelectorAll('button, .btn');
+            buttons.forEach(btn => btn.remove());
+
+            // Remove download section
+            const downloadSection = pdfElement.querySelector('.card:last-child');
+            if (downloadSection) downloadSection.remove();
+
+            // Style all cards for PDF
+            const cards = pdfElement.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.style.cssText = `
+                    border: 2px solid #333 !important;
+                    margin-bottom: 20px !important;
+                    page-break-inside: avoid !important;
+                    background: white !important;
+                `;
+                
+                // Style card headers
+                const header = card.querySelector('.card-header');
+                if (header) {
+                    header.style.cssText = `
+                        background: #f8f9fa !important;
+                        color: #333 !important;
+                        border-bottom: 2px solid #333 !important;
+                        padding: 10px 15px !important;
+                        font-weight: bold !important;
+                    `;
+                }
+                
+                // Style card body
+                const body = card.querySelector('.card-body');
+                if (body) {
+                    body.style.cssText = `
+                        padding: 15px !important;
+                        background: white !important;
+                    `;
+                }
+            });
+
+            // Style text elements
+            const textElements = pdfElement.querySelectorAll('p, span, div, h5, h6');
+            textElements.forEach(el => {
+                if (el.tagName === 'H5' || el.tagName === 'H6') {
+                    el.style.cssText = `
+                        color: #333 !important;
+                        font-weight: bold !important;
+                        margin-bottom: 10px !important;
+                        font-size: 14px !important;
+                    `;
+                } else {
+                    el.style.cssText = `
+                        color: #333 !important;
+                        margin-bottom: 8px !important;
+                    `;
+                }
+            });
+
+            // Style tables if they exist
+            const tables = pdfElement.querySelectorAll('table');
+            tables.forEach(table => {
+                table.style.cssText = `
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                    margin-bottom: 15px !important;
+                    font-size: 11px !important;
+                `;
+                
+                const cells = table.querySelectorAll('td, th');
+                cells.forEach(cell => {
+                    cell.style.cssText = `
+                        border: 1px solid #333 !important;
+                        padding: 6px 8px !important;
+                        text-align: left !important;
+                        vertical-align: top !important;
+                    `;
+                });
+                
+                // Style table headers
+                const headers = table.querySelectorAll('th');
+                headers.forEach(header => {
+                    header.style.cssText = `
+                        background: #f8f9fa !important;
+                        font-weight: bold !important;
+                        border: 1px solid #333 !important;
+                        padding: 8px !important;
+                        text-align: left !important;
+                    `;
+                });
+            });
+
+            // Handle charts for PDF
+            const charts = pdfElement.querySelectorAll('canvas');
+            charts.forEach(canvas => {
+                // Convert canvas to image for better PDF rendering
+                try {
+                    const ctx = canvas.getContext('2d');
+                    const dataURL = canvas.toDataURL('image/png');
+                    const img = document.createElement('img');
+                    img.src = dataURL;
+                    img.style.cssText = `
+                        max-width: 100% !important;
+                        height: auto !important;
+                        display: block !important;
+                        margin: 10px auto !important;
+                    `;
+                    canvas.parentNode.replaceChild(img, canvas);
+                } catch (e) {
+                    console.log('Chart conversion failed:', e);
+                }
+            });
+
+            // Add page breaks where appropriate
+            const sections = pdfElement.querySelectorAll('.card');
+            sections.forEach((section, index) => {
+                if (index > 0 && index % 2 === 0) {
+                    section.style.pageBreakBefore = 'always';
+                }
+            });
+
+            // Add to body temporarily (hidden)
+            pdfElement.style.position = 'absolute';
+            pdfElement.style.left = '-9999px';
+            pdfElement.style.top = '0';
+            document.body.appendChild(pdfElement);
+
+            return pdfElement;
         }
 
         document.getElementById('recommendationForm').addEventListener('submit', async function(e) {
