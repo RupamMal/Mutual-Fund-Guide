@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "mutual-fund-analyzer"
 version = "1.0.0"
 description = "Mutual Fund Analysis and Recommendation System"
-requires-python = ">=3.8,<3.14"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "flask==3.0.0",
     "requests==2.31.0",
@@ -24,3 +24,4 @@ dependencies = [
 
 [tool.setuptools]
 packages = ["app", "mutual_fund_analyzer", "llm_recommender"]
+
