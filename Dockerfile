@@ -1,23 +1,20 @@
-# Use official Python 3.12 slim image
 FROM python:3.12-slim
 
-# Set the working directory
+# Install system dependencies for building Python packages
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3-dev \
+    libssl-dev \
+    libffi-dev \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Upgrade pip & install build tools
+RUN pip install --upgrade pip setuptools wheel
+
 WORKDIR /app
-
-# Copy requirements first and install them
-COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt && \
-    pip install gunicorn
-
-# Copy the rest of the project
 COPY . .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Vercel expects app on port 8080
-EXPOSE 8080
-ENV PORT=8080
-ENV HOST=0.0.0.0
-
-# Start Gunicorn, pointing to the Flask app inside index.py
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "index:app"]
+CMD ["python", "index.py"]
 
