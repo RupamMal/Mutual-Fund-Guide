@@ -4,14 +4,14 @@ set -e
 echo "Starting Vercel build with Python 3.13..."
 
 # Force Python 3.13
-export PYTHON_VERSION=3.9
-export PYTHON_RUNTIME=python3.9
+export PYTHON_VERSION=3.12
+export PYTHON_RUNTIME=python3.12
 
 # Check Python version
-python3.9 --version
+python3.12 --version
 
 # Install dependencies with Python 3.13
-python3.9 -m pip install --no-cache-dir --disable-pip-version-check --target . --upgrade -r requirements.txt
+python3.12 -m pip install --no-cache-dir --disable-pip-version-check --target . --upgrade -r requirements.txt
 
 
 # Clean up to reduce size
