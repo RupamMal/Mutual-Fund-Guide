@@ -3,7 +3,7 @@
   "version": 2, 
   "functions": { 
     "api/index.py": { 
-      "runtime": "python3.9", "maxDuration": 10, "memory": 1024 }
+      "runtime": "python3.9.13", "maxDuration": 10, "memory": 1024 }
    }, 
   "routes": [ 
     { "src": "/(.*)", 
