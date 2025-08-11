@@ -3,7 +3,9 @@
   "version": 2, 
   "functions": { 
     "api/index.py": { 
-      "runtime": "python3.12", "maxDuration": 10, "memory": 1024 }
+      "runtime": "vercel-python@3.12.0",
+      "maxDuration": 10,
+      "memory": 1024 }
    }, 
   "routes": [ 
     { "src": "/(.*)", 
