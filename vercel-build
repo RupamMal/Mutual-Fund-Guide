@@ -1,11 +1,11 @@
 #!/bin/bash
 # Force Python 3.9 for Vercel build with size optimization
-export PYTHON_VERSION=3.9
+export PYTHON_VERSION=3.12
 export PIP_NO_CACHE_DIR=1
 export PIP_DISABLE_PIP_VERSION_CHECK=1
 
 # Use production requirements for smaller bundle
-python3.9 -m pip install --no-cache-dir --disable-pip-version-check --target . --upgrade -r requirements.txt
+python3.12 -m pip install --no-cache-dir --disable-pip-version-check --target . --upgrade -r requirements.txt
 
 
 # Clean up unnecessary files to reduce size
